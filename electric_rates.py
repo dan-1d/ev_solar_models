@@ -1,10 +1,33 @@
+import time
+import datetime
+
 class elect_use_cost_tou:
     def __init__(self, rates, use):
+        '''
+        'use' is a Pandas DataFrame object
+        For now, only supports column names via SDG&E csv export
+
+        'rates' is an instance of the class elect_rates
+        '''
         self.rates = rates
-        self.use = use
+        self.use_df = use
+
+        # add column "datetime" to use data for the date+time
+        # use the strptime format to convert from the string to "time" object
+        # convert into datetime object
+        time_frmt = "%m/%d/%Y %I:%M %p"
+        self.use_df["datetime"]= self.use_df.apply( lambda row: 
+            datetime.datetime.fromtimestamp(time.mktime( time.strptime( 
+            str(row["Date"]+" "+row["Start Time"]), time_frmt ))), axis=1)
+
     
-    def total_cost(self):
-        pass  #TODO
+    def get_cost(self):
+        #todo: specify start and end days/times
+        cost = self.use_df.apply( lambda row:
+            self.rates.get_rate(row["datetime"]) * row["Value"]
+            , axis=1 ).sum()
+        return cost
+
 
 
 
