@@ -3,6 +3,7 @@ import datetime
 
 class elect_use_cost_tou:
     def __init__(self, rates, use):
+	self.use_df = 
         '''
         'use' is a Pandas DataFrame object
         For now, only supports column names via SDG&E csv export
@@ -20,6 +21,11 @@ class elect_use_cost_tou:
             datetime.datetime.fromtimestamp(time.mktime( time.strptime( 
             str(row["Date"]+" "+row["Start Time"]), time_frmt ))), axis=1)
 
+	def read_sdge_use_csv(self, csv_file):
+		e_daily = pd.read_csv(csv_file)
+		#TODO: move the sdge formatting stuff to here. Delete from there, and make a generic __init__
+		
+		
     
     def get_cost(self):
         #todo: specify start and end days/times
