@@ -1,18 +1,21 @@
 import time
 import datetime
+import numpy as np
+import pandas as pd
+
 
 class elect_use_cost_tou:
-    def __init__(self, rates, use):
-	self.use_df = 
+    def __init__(self, rates):
         '''
-        'use' is a Pandas DataFrame object
+        use is a Pandas DataFrame object
         For now, only supports column names via SDG&E csv export
-
-        'rates' is an instance of the class elect_rates
+        rates is an instance of the class elect_rates
         '''
         self.rates = rates
-        self.use_df = use
+        self.use_df = pd.DataFrame()
 
+    def read_sdge_use_csv(self, csv_file):
+        self.use_df = pd.read_csv(csv_file)
         # add column "datetime" to use data for the date+time
         # use the strptime format to convert from the string to "time" object
         # convert into datetime object
@@ -20,19 +23,34 @@ class elect_use_cost_tou:
         self.use_df["datetime"]= self.use_df.apply( lambda row: 
             datetime.datetime.fromtimestamp(time.mktime( time.strptime( 
             str(row["Date"]+" "+row["Start Time"]), time_frmt ))), axis=1)
+        
 
-	def read_sdge_use_csv(self, csv_file):
-		e_daily = pd.read_csv(csv_file)
-		#TODO: move the sdge formatting stuff to here. Delete from there, and make a generic __init__
-		
-		
+    def add_use_hourly_dailyrepeat(self, hourly_use, start_datetime=None, end_datetime=None):
+        if start_datetime is None:
+            start_datetime=self.use_df["datetime"].iloc[0]
+        if end_datetime is None: 
+            end_datetime=self.use_df["datetime"].iloc[-1]
+        '''
+        apply a given hourly use across the class's use_df
+        input format: dataframe with columns {"hour","energy_kwh"}
+        '''
+        #TODO: clip the selection of rows to the range of datetime given
+        use_dateclipped = self.use_df.copy()
+        use_dateclipped.Value = use_dateclipped.apply( lambda row:
+            hourly_use[row["datetime"].hour] + row.Value,
+            axis = 1 )
+
+
+        return use_dateclipped
+        
     
     def get_cost(self):
-        #todo: specify start and end days/times
-        cost = self.use_df.apply( lambda row:
+        #todo: return the use_df with this as new column
+        with_cost = self.use_df
+        with_cost["cost"] = self.use_df.apply( lambda row:
             self.rates.get_rate(row["datetime"]) * row["Value"]
-            , axis=1 ).sum()
-        return cost
+            , axis=1 )
+        return with_cost
 
 
 

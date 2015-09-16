@@ -1,3 +1,7 @@
+import numpy as np
+import pandas as pd
+
+
 class vehicle_ice:
     def __init__(self, name, mpg_hwy, mpg_city, average_override=None):
         self.mpg_hwy = mpg_hwy
@@ -12,11 +16,11 @@ class vehicle_ice:
     
     
 class vehicle_ev:
-    def __init__(self, name, kwh_per_mile, charge_rate_kw=3.3):
+    def __init__(self, name, kwh_per_mile, charge_rate_kw=3.6):
         self.kwh_per_mile = kwh_per_mile
         self.charge_rate_kw = charge_rate_kw
         
-    class get_charge_needs_hourly(self, total_charge_kwh):
+    def get_charge_needs_hourly(self, total_charge_kwh):
         daily_charge_needs_kwh = total_charge_kwh
         daily_charge_hourly_df = pd.DataFrame()
         daily_charge_hourly_df["hour"] = np.arange(0,24,1)
