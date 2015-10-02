@@ -7,14 +7,17 @@ import pandas as pd
 class elect_use_cost_tou:
     def __init__(self, rates):
         '''
-        use is a Pandas DataFrame object
-        For now, only supports column names via SDG&E csv export
+        'use' is a Pandas DataFrame object. Must use column names "datetime" and "Value"
+        
         rates is an instance of the class elect_rates
         '''
         self.rates = rates
         self.use_df = pd.DataFrame()
 
     def read_sdge_use_csv(self, csv_file):
+        ''''
+        For now, only supports column names via SDG&E csv export
+        '''
         self.use_df = pd.read_csv(csv_file)
         # add column "datetime" to use data for the date+time
         # use the strptime format to convert from the string to "time" object
@@ -23,6 +26,15 @@ class elect_use_cost_tou:
         self.use_df["datetime"]= self.use_df.apply( lambda row: 
             datetime.datetime.fromtimestamp(time.mktime( time.strptime( 
             str(row["Date"]+" "+row["Start Time"]), time_frmt ))), axis=1)
+
+    def load_from_df(self, use_df):
+        '''
+        copy the needed columns to this class's dataframe 
+        '''
+#        self.use_df["datetime"] = use_df["datetime"]
+#        self.use_df["Value"] = use_df["Value"]
+        self.use_df = use_df[ ["datetime","Value"] ]
+
         
 
     def add_use_hourly_dailyrepeat(self, hourly_use, start_datetime=None, end_datetime=None):
@@ -32,14 +44,22 @@ class elect_use_cost_tou:
             end_datetime=self.use_df["datetime"].iloc[-1]
         '''
         apply a given hourly use across the class's use_df
-        input format: dataframe with columns {"hour","energy_kwh"}
+        input format: dataframe with columns {"hour","energy_kw"}
         '''
+        #
         #TODO: clip the selection of rows to the range of datetime given
+        #
+        
+        #update energy
         use_dateclipped = self.use_df.copy()
-        use_dateclipped.Value = use_dateclipped.apply( lambda row:
-            hourly_use[row["datetime"].hour] + row.Value,
+        use_dateclipped["Value"] = use_dateclipped.apply( lambda row:
+            row.Value + float(hourly_use.loc[hourly_use["hour"]==row["datetime"].hour ].energy_kw),
             axis = 1 )
 
+        #update cost
+        use_dateclipped["Value"] = use_dateclipped.apply( lambda row:
+            row.Value + float(hourly_use.loc[hourly_use["hour"]==row["datetime"].hour ].energy_kw),
+            axis = 1 )
 
         return use_dateclipped
         
