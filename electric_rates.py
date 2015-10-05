@@ -57,9 +57,9 @@ class elect_use_cost_tou:
             axis = 1 )
 
         #update cost
-        use_dateclipped["Value"] = use_dateclipped.apply( lambda row:
-            row.Value + float(hourly_use.loc[hourly_use["hour"]==row["datetime"].hour ].energy_kw),
-            axis = 1 )
+#        use_dateclipped["cost"] = use_dateclipped.apply( lambda row:
+#            row.Value + float(hourly_use.loc[hourly_use["hour"]==row["datetime"].hour ].energy_kw),
+#            axis = 1 )
 
         return use_dateclipped
         
