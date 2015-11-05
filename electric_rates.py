@@ -117,14 +117,14 @@ class elect_rates:
         self.tiers = list()
     
     def add_sdge_tou_ev_rates(self):
-        self.add_tier( elect_tou_tier(0, 4, 0.17, 5, 9) )
-        self.add_tier( elect_tou_tier(0, 4, 0.18, 10, 4) )
-        self.add_tier( elect_tou_tier(5, 11, 0.20, 5, 9) )
-        self.add_tier( elect_tou_tier(5, 11, 0.21, 10, 4) )
-        self.add_tier( elect_tou_tier(12, 17, 0.48, 5, 9) )
-        self.add_tier( elect_tou_tier(12, 17, 0.21, 10, 4) )
-        self.add_tier( elect_tou_tier(18, 23, 0.20, 5, 9) )
-        self.add_tier( elect_tou_tier(18, 23, 0.21, 10, 4) )
+        self.add_tier( elect_tou_tier(0, 4, 0.17, 5, 10) )
+        self.add_tier( elect_tou_tier(0, 4, 0.19, 11, 4) )
+        self.add_tier( elect_tou_tier(5, 11, 0.20, 5, 10) )
+        self.add_tier( elect_tou_tier(5, 11, 0.21, 11, 4) )
+        self.add_tier( elect_tou_tier(12, 17, 0.48, 5, 10) )
+        self.add_tier( elect_tou_tier(12, 17, 0.22, 11, 4) )
+        self.add_tier( elect_tou_tier(18, 23, 0.20, 5, 10) )
+        self.add_tier( elect_tou_tier(18, 23, 0.21, 11, 4) )
         
     
     def add_tier(self, tou_tier):
@@ -146,5 +146,5 @@ class elect_rates:
         
     def get_ave_rate(self):
         # TODO: Do the actual average based on usage
-        return self.tiers[0].dollars_per_kwh
+        return (self.tiers[0].dollars_per_kwh + self.tiers[1].dollars_per_kwh)/2.0
         
